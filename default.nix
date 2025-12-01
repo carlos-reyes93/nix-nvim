@@ -87,13 +87,14 @@
       categories = {
         general = true;
       };
-      # anything else to pass and grab in lua with `nixCats.extra`
       extra = {};
     };
 
     regularCats = {pkgs, ...} @ misc: {
       settings = {
         wrapRc = false;
+        aliases = [ "testNvim" ];
+        configDirName = "nvim";
       };
       categories = {
         general = true;
@@ -101,8 +102,6 @@
     };
   };
 
-  # We will build the one named nvim here and export that one.
   defaultPackageName = "nvim";
-  # return our package!
 in
   utils.baseBuilder luaPath {inherit pkgs;} categoryDefinitions packageDefinitions defaultPackageName
