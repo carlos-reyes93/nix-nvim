@@ -8,4 +8,7 @@ return {
 		{ "<A-j>", "<CMD>NavigatorDown<CR>", mode = { "n", "t" } },
 		{ "<A-p>", "<CMD>NavigatorPrevious<CR>", mode = { "n", "t" } },
 	},
+  after = function ()
+    require("Navigator").setup({})
+  end
 }
