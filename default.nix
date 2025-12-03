@@ -10,15 +10,7 @@
   luaPath = ./.;
 
   # see :help nixCats.flake.outputs.categories
-  categoryDefinitions = {
-    pkgs,
-    settings,
-    categories,
-    extra,
-    name,
-    mkPlugin,
-    ...
-  } @ packageDef: {
+  categoryDefinitions = {pkgs, ...}: {
     lspsAndRuntimeDeps = {
       general = with pkgs; [
         lazygit
@@ -28,54 +20,90 @@
         alejandra
         fd
         ripgrep
+        lua54Packages.luacheck
       ];
     };
 
     # This is for plugins that will load at startup without using packadd:
     startupPlugins = {
-      general = with pkgs.vimPlugins; [
-        snacks-nvim
-        catppuccin-nvim
-        vim-sleuth
-        mini-ai
-        mini-icons
-        mini-pairs
-        nvim-lspconfig
-        vim-startuptime
-        blink-cmp
-        nvim-treesitter.withAllGrammars
+      debug = with pkgs.vimPlugins; [nvim-nio];
+      general = with pkgs.vimPlugins; {
+        always = [
+          catppuccin-nvim
+          lze
+          lzextras
+          plenary-nvim
+          nvim-notify
+          nvim-lspconfig
+        ];
+        moveToOptional = with pkgs.vimPlugins; [
+          Navigator-nvim
+          snacks-nvim
+        ];
+        extra = [
+          oil-nvim
+          nvim-web-devicons
+        ];
+      };
+      ui = with pkgs.vimPlugins; [
         lualine-nvim
         lualine-lsp-progress
-        gitsigns-nvim
-        which-key-nvim
-        nvim-lint
-        conform-nvim
-        nvim-dap
-        nvim-dap-ui
-        nvim-dap-virtual-text
-        oil-nvim
       ];
     };
 
     optionalPlugins = {
-      general = with pkgs.vimPlugins; [
-        lazydev-nvim
+      general = {
+        blink = with pkgs.vimPlugins; [
+          luasnip
+          cmp-cmdline
+          blink-cmp
+          blink-compat
+          colorful-menu-nvim
+        ];
+        treesitter = with pkgs.vimPlugins; [
+          nvim-treesitter-textobjects
+          nvim-treesitter.withAllGrammars
+        ];
+        always = with pkgs.vimPlugins; [
+          lazydev-nvim
+          vim-sleuth
+          mini-ai
+          mini-icons
+          mini-pairs
+        ];
+        extra = with pkgs.vimPlugins; [
+          fidget-nvim
+          vim-startuptime
+          which-key-nvim
+          indent-blankline-nvim
+          gitsigns-nvim
+        ];
+      };
+
+      debug = with pkgs.vimPlugins; {
+        default = [
+          nvim-dap
+          nvim-dap-ui
+          nvim-dap-virtual-text
+        ];
+      };
+      lint = with pkgs.vimPlugins; [
+        nvim-lint
       ];
+      format = with pkgs.vimPlugins; [
+        conform-nvim
+      ];
+      markdown = with pkgs.vimPlugins; [markdown-preview-nvim];
     };
 
     sharedLibraries = {
-      general = with pkgs; [];
+      general = [];
     };
   };
 
   # see :help nixCats.flake.outputs.packageDefinitions
   packageDefinitions = {
-    nvim = {
-      pkgs,
-      name,
-      mkPlugin,
-      ...
-    }: {
+    nvim = {pkgs, ...}: {
       settings = {
         suffix-path = true;
         suffix-LD = true;
@@ -86,18 +114,34 @@
       };
       categories = {
         general = true;
+        ui = true;
+        markdown = true;
+        lint = true;
+        format = true;
+        lspDebugMode = false;
+        colorscheme = "catppuccin";
       };
-      extra = {};
+      extra = {
+        nixdExtras = {
+          nixpkgs = ''import ${pkgs.path} {}'';
+        };
+      };
     };
 
-    regularCats = {pkgs, ...} @ misc: {
+    regularCats = {...}: {
       settings = {
         wrapRc = false;
-        aliases = [ "testNvim" ];
+        aliases = ["testNvim"];
         configDirName = "nvim";
       };
       categories = {
         general = true;
+        ui = true;
+        markdown = true;
+        lint = true;
+        format = true;
+        lspDebugMode = false;
+        colorscheme = "catppuccin";
       };
     };
   };

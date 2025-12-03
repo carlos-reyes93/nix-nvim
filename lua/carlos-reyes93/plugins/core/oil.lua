@@ -1,6 +1,3 @@
-if not nixCats("general") then
-	return
-end
 
 vim.g.loaded_netrwPlugin = 1
 require("oil").setup({

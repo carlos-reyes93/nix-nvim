@@ -1,6 +1,3 @@
-if not nixCats('general') then
-  return
-end
 -- NOTE: Lazydev will make your Lua LSP stronger for Neovim config
 -- we are also using this as an opportunity to show you how to lazy load plugins!
 -- This plugin was added to the optionalPlugins section of the main nix file of this template.
