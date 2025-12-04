@@ -49,7 +49,7 @@
           ripgrep
           lua54Packages.luacheck
           sonarlint-ls
-          typescript-go
+          vtsls
           tailwindcss-language-server
         ];
       };
@@ -140,6 +140,7 @@
           hosts.node.enable = false;
           hosts.ruby.enable = false;
           hosts.perl.enable = false;
+          neovim-unwrapped = inputs.neovim-nightly-overlay.packages.${pkgs.stdenv.hostPlatform.system}.neovim;
         };
         categories = {
           general = true;
@@ -157,11 +158,12 @@
         };
       };
 
-      regularCats = {...}: {
+      regularCats = {pkgs,...}: {
         settings = {
           wrapRc = false;
           aliases = ["testNvim"];
           configDirName = "nvim";
+          neovim-unwrapped = inputs.neovim-nightly-overlay.packages.${pkgs.stdenv.hostPlatform.system}.neovim;
         };
         categories = {
           general = true;
