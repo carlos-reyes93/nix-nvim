@@ -18,6 +18,7 @@
   } @ inputs: let
     inherit (nixCats) utils;
     luaPath = ./.;
+    customSonarLint = import ./pkgs/sonarlint-language-server/derivation.nix { pkgs = nixpkgs.legacyPackages.x86_64-linux; };
     forEachSystem = utils.eachSystem ["x86_64-linux"];
     extra_pkg_config = {
       allowUnfree = true;
@@ -48,9 +49,10 @@
           fd
           ripgrep
           lua54Packages.luacheck
-          sonarlint-ls
+          customSonarLint
           vtsls
           tailwindcss-language-server
+          nodejs_22
         ];
       };
 

@@ -1,9 +1,5 @@
 -- NOTE: lsp setup via lspconfig
 
-local sonarlintStorePath = vim.fn.exepath("sonarlint-ls")
-local parent = vim.fn.fnamemodify(sonarlintStorePath, ":h:h")
-local jsAnalyzer = vim.fs.joinpath(parent,"share","plugins", "sonarjs.jar")
-print(jsAnalyzer)
 local servers = {}
 
 -- most don't need much configuration
@@ -12,33 +8,7 @@ local servers = {}
 servers.vtsls = {}
 servers.tailwindcss = {}
 
-servers.sonarlint = {
-	cmd = {
-    "sonarlint-ls",
-    "-stdio",
-    "-analyzers",
-    jsAnalyzer
-  },
-	filetypes = {
-		"javascript",
-		"javascriptreact",
-		"typescript",
-		"typescriptreact",
-	},
-  settings = {
-    sonarlint = {
-      rules = {
-        ["javascript:S100"] = { level = "on" },
-      },
-      logging = {
-        logFile = vim.fn.stdpath("cache") .. "/sonarlint.log",
-        level = "DEBUG"  -- TRACE, DEBUG, INFO, WARN, ERROR
-      }
-
-    }
-  }
-
-}
+servers.sonarlint = require("carlos-reyes93.plugins.lsp.servers.sonarlint").sonarlint
 
 -- but you can provide some if you want to!
 servers.lua_ls = {
@@ -49,53 +19,13 @@ servers.lua_ls = {
 			},
 			signatureHelp = { enabled = true },
 			diagnostics = {
-				globals = { "vim", "nixCats" }, 
+				globals = { "vim", "nixCats" },
 				disable = { "missing-fields" },
 			},
 		},
 	},
 }
--- nixd requires some configuration.
--- luckily, the nixCats plugin is here to pass whatever we need!
--- for additional configuration options, refer to:
--- https://github.com/nix-community/nixd/blob/main/nixd/docs/configuration.md
-servers.nixd = {
-	settings = {
-		nixd = {
-			nixpkgs = {
-				-- in the extras set of your package definition:
-				-- nixdExtras.nixpkgs = ''import ${pkgs.path} {}''
-				expr = nixCats.extra("nixdExtras.nixpkgs") or [[import <nixpkgs> {}]],
-			},
-			options = {
-				-- If you integrated with your system flake,
-				-- you should use inputs.self as the path to your system flake
-				-- that way it will ALWAYS work, regardless
-				-- of where your config actually was.
-				nixos = {
-					-- in this package definition's.extra set
-					-- nixdExtras.nixos_options = ''(builtins.getFlake "path:${builtins.toString inputs.self.outPath}").nixosConfigurations.configname.options''
-					expr = nixCats.extra("nixdExtras.nixos_options"),
-				},
-				-- If you have your config as a separate flake, inputs.self would be referring to the wrong flake.
-				-- You can override the correct one into your package definition on import in your main configuration,
-				-- or just put an absolute path to where it usually is and accept the impurity.
-				["home-manager"] = {
-					-- nixdExtras.home_manager_options = ''(builtins.getFlake "path:${builtins.toString inputs.self.outPath}").homeConfigurations.configname.options''
-					expr = nixCats.extra("nixdExtras.home_manager_options"),
-				},
-			},
-			formatting = {
-				command = {},
-			},
-			diagnostic = {
-				suppress = {
-					"sema-escaping-with",
-				},
-			},
-		},
-	},
-}
+servers.nixd = require("carlos-reyes93.plugins.lsp.servers.nixd").nixd
 
 vim.lsp.config("*", {
 	-- capabilities = capabilities,
@@ -150,50 +80,4 @@ for server_name, cfg in pairs(servers) do
 	vim.lsp.config(server_name, cfg)
 	vim.lsp.enable(server_name)
 end
-
-
--- Function to query SonarLint rules and enable all JS/TS rules
-local function enable_all_js_ts_rules()
-  -- Get all active LSP clients for the current buffer
-  local clients = vim.lsp.get_clients({ bufnr = 0 })
-
-  for _, client in ipairs(clients) do
-    if client.name == "sonarlint" then
-      -- Request all rules from SonarLint
-      client.request(
-        "workspace/executeCommand",
-        { command = "sonarlint/listRules" },
-        function(err, result, ctx)
-          if err then
-            print("Error fetching SonarLint rules:", err)
-            return
-          end
-
-          -- Filter JS/TS rules and enable them
-          local js_ts_rules = {}
-          for _, rule in ipairs(result or {}) do
-            if rule.key:match("^javascript:") or rule.key:match("^typescript:") then
-              js_ts_rules[rule.key] = { level = "on" }
-            end
-          end
-
-          -- Update LSP configuration on-the-fly
-          client.notify("workspace/didChangeConfiguration", {
-            settings = {
-              sonarlint = {
-                rules = js_ts_rules
-              }
-            }
-          })
-
-          print("Enabled all JavaScript/TypeScript SonarLint rules!")
-        end,
-        0
-      )
-    end
-  end
-end
-
--- Run it
-enable_all_js_ts_rules()
 
