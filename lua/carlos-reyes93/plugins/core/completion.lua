@@ -76,7 +76,7 @@ return {
         signature = {
           enabled = true,
           window = {
-            show_documentation = true,
+            show_documentation = false,
           },
         },
         completion = {
