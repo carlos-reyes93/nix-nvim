@@ -53,6 +53,7 @@
           vtsls
           tailwindcss-language-server
           nodejs_22
+          rust-analyzer
         ];
       };
 

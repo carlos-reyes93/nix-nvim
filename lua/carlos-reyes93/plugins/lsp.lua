@@ -5,6 +5,7 @@ local servers = {}
 -- most don't need much configuration
 -- servers.gopls = {}
 -- servers.html = {}
+servers.rust_analyzer = {}
 servers.vtsls = {}
 servers.tailwindcss = {}
 
@@ -80,4 +81,3 @@ for server_name, cfg in pairs(servers) do
 	vim.lsp.config(server_name, cfg)
 	vim.lsp.enable(server_name)
 end
-
