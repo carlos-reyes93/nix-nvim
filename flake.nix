@@ -54,6 +54,8 @@
           tailwindcss-language-server
           nodejs_22
           rust-analyzer
+          eslint_d
+          prettierd
         ];
       };
 

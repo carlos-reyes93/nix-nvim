@@ -8,8 +8,15 @@ require("lze").load({
 				formatters_by_ft = {
 					lua = { "stylua" },
 					nix = { "alejandra" },
-					-- Conform will run multiple formatters sequentially
-					-- javascript = { { "prettierd", "prettier" } },
+					javascript = { "prettierd" },
+					typescript = { "prettierd" },
+					javascriptreact = { "prettierd" },
+					typescriptreact = { "prettierd" },
+					svelte = { "prettierd" },
+					css = { "prettierd" },
+					html = { "prettierd" },
+					json = { "prettierd" },
+					yaml = { "prettierd" },
 				},
 			})
 			vim.keymap.set({ "n", "v" }, "<leader>FF", function()
