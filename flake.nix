@@ -78,6 +78,7 @@
           extra = [
             oil-nvim
             nvim-web-devicons
+            CopilotChat-nvim
           ];
         };
         ui = with pkgs.vimPlugins; [
