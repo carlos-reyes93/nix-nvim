@@ -56,6 +56,7 @@
           rust-analyzer
           eslint_d
           prettierd
+          nodePackages_latest.vscode-langservers-extracted
         ];
       };
 

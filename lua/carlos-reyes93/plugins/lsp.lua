@@ -4,7 +4,8 @@ local servers = {}
 
 -- most don't need much configuration
 -- servers.gopls = {}
--- servers.html = {}
+servers.cssls = {}
+servers.html = {}
 servers.rust_analyzer = {}
 servers.vtsls = {}
 servers.tailwindcss = {}
