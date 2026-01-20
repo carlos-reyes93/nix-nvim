@@ -8,6 +8,18 @@
     neovim-nightly-overlay = {
       url = "github:nix-community/neovim-nightly-overlay";
     };
+    fenix = {
+      url = "github:nix-community/fenix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    bacon = {
+      url = "github:Canop/bacon";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    bacon-ls = {
+      url = "github:crisidev/bacon-ls";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
@@ -18,7 +30,7 @@
   } @ inputs: let
     inherit (nixCats) utils;
     luaPath = ./.;
-    customSonarLint = import ./pkgs/sonarlint-language-server/derivation.nix { pkgs = nixpkgs.legacyPackages.x86_64-linux; };
+    customSonarLint = import ./pkgs/sonarlint-language-server/derivation.nix {pkgs = nixpkgs.legacyPackages.x86_64-linux;};
     forEachSystem = utils.eachSystem ["x86_64-linux"];
     extra_pkg_config = {
       allowUnfree = true;
@@ -28,13 +40,14 @@
       /*
       (import ./overlays inputs) ++
       */
-      (final: prev: {
-        sonarlint-ls = prev.sonarlint-ls.override {
-          mavenDepsHash = "sha256-Fk6JPMmzz7YnPWOdWKOXQ8z6bdYuXSgQdWBOaIlpd4A=";
-        };
-      })
       [
+        (final: prev: {
+          sonarlint-ls = prev.sonarlint-ls.override {
+            mavenDepsHash = "sha256-Fk6JPMmzz7YnPWOdWKOXQ8z6bdYuXSgQdWBOaIlpd4A=";
+          };
+        })
         (utils.standardPluginOverlay inputs)
+        inputs.fenix.overlays.default
       ];
 
     # see :help nixCats.flake.outputs.categories
@@ -42,21 +55,40 @@
       lspsAndRuntimeDeps = {
         general = with pkgs; [
           lazygit
-          lua-language-server
-          stylua
-          nixd
-          alejandra
           fd
           ripgrep
+        ];
+        lua = with pkgs; [
+          stylua
+          lua-language-server
           lua54Packages.luacheck
+        ];
+        nix = with pkgs; [
+          nixd
+          alejandra
+        ];
+        ts = with pkgs; [
           customSonarLint
           vtsls
           tailwindcss-language-server
           nodejs_22
-          rust-analyzer
           eslint_d
           prettierd
           nodePackages_latest.vscode-langservers-extracted
+        ];
+        rust = with pkgs; [
+          graphviz
+          (fenix.complete.withComponents [
+            "cargo"
+            "clippy"
+            "rust-src"
+            "rustc"
+            "rustfmt"
+            "rust-analyzer"
+          ])
+          inputs.bacon.defaultPackage.${pkgs.stdenv.hostPlatform.system}
+          inputs.bacon-ls.defaultPackage.${pkgs.stdenv.hostPlatform.system}
+          taplo
         ];
       };
 
@@ -131,6 +163,7 @@
           conform-nvim
         ];
         markdown = with pkgs.vimPlugins; [markdown-preview-nvim];
+        rust = with pkgs.vimPlugins; [crates-nvim rustaceanvim];
       };
 
       sharedLibraries = {
@@ -156,6 +189,7 @@
           lint = true;
           format = true;
           lspDebugMode = false;
+          rust = true;
           colorscheme = "catppuccin";
         };
         extra = {
@@ -165,7 +199,7 @@
         };
       };
 
-      regularCats = {pkgs,...}: {
+      regularCats = {pkgs, ...}: {
         settings = {
           wrapRc = false;
           aliases = ["testNvim"];
@@ -174,11 +208,15 @@
         };
         categories = {
           general = true;
+          ts = true;
+          nix = true;
           ui = true;
           markdown = true;
           lint = true;
           format = true;
           lspDebugMode = false;
+          rust = true;
+          lua = true;
           colorscheme = "catppuccin";
         };
       };
