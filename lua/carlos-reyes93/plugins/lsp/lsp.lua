@@ -4,7 +4,8 @@ local on_attach = require("carlos-reyes93.plugins.lsp.on_attach")
 local servers = {}
 -- most don't need much configuration
 -- servers.gopls = {}
--- servers.html = {}
+servers.html = {}
+servers.cssls = {}
 servers.vtsls = {}
 servers.tailwindcss = {}
 servers.bacon_ls = {
