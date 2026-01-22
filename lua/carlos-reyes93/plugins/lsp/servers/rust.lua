@@ -4,7 +4,7 @@ require("lze").load({
 		for_cat = "rust",
 		ft = { "rust" },
 		lazy = false,
-		init = function(plugin)
+		init = function(_)
 			vim.g.rustaceanvim = {
 				server = {
 					on_attach = require("carlos-reyes93.plugins.lsp.on_attach"),
