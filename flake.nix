@@ -184,12 +184,15 @@
         };
         categories = {
           general = true;
+          ts = true;
+          nix = true;
           ui = true;
           markdown = true;
           lint = true;
           format = true;
           lspDebugMode = false;
           rust = true;
+          lua = true;
           colorscheme = "catppuccin";
         };
         extra = {
