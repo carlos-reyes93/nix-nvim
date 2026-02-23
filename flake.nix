@@ -103,6 +103,7 @@
             plenary-nvim
             nvim-notify
             nvim-lspconfig
+            markdown-preview-nvim
           ];
           moveToOptional = with pkgs.vimPlugins; [
             Navigator-nvim
